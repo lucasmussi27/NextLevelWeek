@@ -1,6 +1,5 @@
 import express from "express";
 const routes = express.Router();
-import knex from "./database/connection";
 import PointsController from "./controllers/PointsController";
 import ItemsController from "./controllers/ItemsController";
 
