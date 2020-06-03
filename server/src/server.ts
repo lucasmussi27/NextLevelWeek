@@ -1,15 +1,15 @@
 import express from "express";
+import path from "path";
+import cors from "cors";
+import routes from "./routes";
 
 const app = express();
+app.use(cors());
+app.use(express.json());
+app.use(routes);
 
-app.get('/', (req,res) => {
-  res.json({ message: 'Hello friend :3'})
-})
-
-app.get('/users', (req,res) => {
-  res.send("Hello to all our friends :3")
-})
+app.use('/uploads', express.static(path.resolve(__dirname, "..", "uploads")));
 
 app.listen(3000, () => {
-  console.log('Listening on http://localhost:3000')
-})
+  console.log('Listening on http://localhost:3000');
+});
