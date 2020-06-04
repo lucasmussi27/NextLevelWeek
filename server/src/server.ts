@@ -11,5 +11,5 @@ app.use(routes);
 app.use('/uploads', express.static(path.resolve(__dirname, "..", "uploads")));
 
 app.listen(3000, () => {
-  console.log('Listening on http://localhost:3000');
+  console.log('Listening on http://10.0.0.108:3000');
 });
