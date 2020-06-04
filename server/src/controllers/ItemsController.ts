@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import connection from "../database/connection";
+import { connection } from "../database/connection";
 
 export default class ItemsController {
   async listAll(req: Request, res: Response) {
