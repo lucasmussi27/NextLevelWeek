@@ -7,6 +7,7 @@ import axios from "axios";
 import "./styles.css";
 import logo from "../../assets/logo.svg";
 import { LeafletMouseEvent } from "leaflet";
+import Dropzone from "../../components/Dropzone";
 
 interface Item {
   id: number
@@ -14,11 +15,11 @@ interface Item {
   image_url: string
 }
 
-interface IBGEUF {
+interface UF {
   sigla: string
 }
 
-interface IBGECity {
+interface City {
   nome: string
 }
 
@@ -34,6 +35,7 @@ const RegisterPoint = () => {
   const [formData, setFormData] = useState({
     name: '', email: '', whatsapp: ''
   });
+  const [selectedFile, setSelectedFile] = useState<File>();
   const history = useHistory();
 
   useEffect(() => {
@@ -52,13 +54,13 @@ const RegisterPoint = () => {
   }, []);
 
   useEffect(() => {
-    axios.get<IBGEUF[]>('https://servicodados.ibge.gov.br/api/v1/localidades/estados')
+    axios.get<UF[]>('https://servicodados.ibge.gov.br/api/v1/localidades/estados')
       .then(({ data }) => setUfs(data.map(uf => uf.sigla)));
   }, []);
 
   useEffect(() => {
     if(selectedUF == '0') return;
-    axios.get<IBGECity[]>(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${selectedUF}/municipios`)
+    axios.get<City[]>(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${selectedUF}/municipios`)
       .then(({ data }) => setCities(data.map(city => city.nome)));
   }, [selectedUF]);
 
@@ -96,10 +98,19 @@ const RegisterPoint = () => {
     const city = selectedCity;
     const [latitude,longitude] = position;
     const items = selectedItems;
-    await api.post('points', {
-      name, email, whatsapp, uf, city,
-      latitude, longitude, items
-    });
+    const data = new FormData();
+
+    data.append('name', name);
+    data.append('email', email);
+    data.append('whatsapp', whatsapp);
+    data.append('uf', uf);
+    data.append('city', city);
+    data.append('latitude', String(latitude));
+    data.append('longitude', String(longitude));
+    data.append('items', items.join(','));
+    if(selectedFile) data.append('image', selectedFile);
+
+    await api.post('points', data);
     alert('Ponto de Coleta Criado!');
     history.push('/');
   }
@@ -115,6 +126,7 @@ const RegisterPoint = () => {
       </header>
       <form onSubmit={handleSubmit}>
         <h1>Cadastro do <br />Ponto de Coleta</h1>
+        <Dropzone onFileUploaded={setSelectedFile} />
         <fieldset>
           <legend>
             <h2>Dados</h2>
